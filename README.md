@@ -1,5 +1,14 @@
-# Sentinel ML — Security Operations Center
+<div align="center">
 
+![preview](./static/arrest.gif)
+![preview](./static/arson.gif)
+![preview](./static/burglary.gif)
+![preview](./static/explosion.gif)
+
+# Sentinel-ML  Security Operations Center
+
+</div>
+  
 Multi-label security anomaly detection system with AI-powered incident report generation (OpenAI GPT-4o). Web dashboard for security operators. Runs at http://localhost:5000
 
 ## Setup
