@@ -1,4 +1,4 @@
-"""Generación de reportes de incidentes con OpenAI GPT-4o."""
+"""Incident report generation with OpenAI GPT-4o."""
 
 import json
 from datetime import datetime
@@ -15,52 +15,52 @@ def _get_client() -> OpenAI:
 
 
 _FEATURE_LABELS = {
-    "sensor_movimiento": "Sensor de movimiento",
-    "camara_activa": "Cámara activa",
-    "hora_nocturna": "Hora nocturna",
-    "zona_riesgo": "Zona de riesgo",
-    "sensor_puerta": "Sensor de puerta",
-    "sensor_ventana": "Sensor de ventana",
-    "nivel_ruido": "Nivel de ruido",
-    "historico_incidentes": "Histórico de incidentes",
-    "avg_personas": "Promedio de personas",
-    "max_personas": "Máximo de personas",
-    "avg_confianza_persona": "Confianza en detección de personas",
-    "area_persona_max": "Área máxima de persona",
-    "intensidad_movimiento": "Intensidad de movimiento",
-    "clases_unicas": "Clases únicas detectadas",
-    "detecciones_promedio": "Detecciones promedio",
-    "velocidad_persona": "Velocidad de persona",
+    "sensor_movimiento": "Motion sensor",
+    "camara_activa": "Active camera",
+    "hora_nocturna": "Night-time",
+    "zona_riesgo": "Risk zone",
+    "sensor_puerta": "Door sensor",
+    "sensor_ventana": "Window sensor",
+    "nivel_ruido": "Noise level",
+    "historico_incidentes": "Incident history",
+    "avg_personas": "Average persons",
+    "max_personas": "Maximum persons",
+    "avg_confianza_persona": "Person detection confidence",
+    "area_persona_max": "Maximum person area",
+    "intensidad_movimiento": "Motion intensity",
+    "clases_unicas": "Unique classes detected",
+    "detecciones_promedio": "Average detections",
+    "velocidad_persona": "Person speed",
 }
 
 _LABEL_LABELS = {
-    "intrusion_probable": "Intrusión probable",
-    "requiere_verificacion_visual": "Requiere verificación visual",
-    "notificar_propietario": "Notificar al propietario",
-    "despachar_movil": "Despachar móvil de emergencia",
+    "intrusion_probable": "Probable intrusion",
+    "requiere_verificacion_visual": "Requires visual verification",
+    "notificar_propietario": "Notify owner",
+    "despachar_movil": "Dispatch emergency unit",
 }
 
 
 def compute_severity(prediction: dict) -> str:
     active = [k for k, v in prediction.items() if v["activo"]]
     if "despachar_movil" in active:
-        return "CRÍTICO"
+        return "CRITICAL"
     if "intrusion_probable" in active and len(active) >= 2:
-        return "ALTO"
+        return "HIGH"
     if "intrusion_probable" in active or len(active) >= 2:
-        return "MEDIO"
+        return "MEDIUM"
     if len(active) == 1:
-        return "BAJO"
+        return "LOW"
     return "NORMAL"
 
 
 def generate_report(prediction: dict, signals: list, feature_names: list) -> dict:
-    """Genera un reporte de incidente usando GPT-4o.
+    """Generates an incident report using GPT-4o.
 
     Args:
         prediction: {label: {activo: bool, probabilidad: float}, ...}
-        signals: lista de valores de señales
-        feature_names: nombres de features en el mismo orden que signals
+        signals: list of signal values
+        feature_names: feature names in the same order as signals
     """
     severity = compute_severity(prediction)
     timestamp = datetime.now().isoformat()
@@ -70,17 +70,17 @@ def generate_report(prediction: dict, signals: list, feature_names: list) -> dic
         for n, v in zip(feature_names, signals)
     )
     detections = "\n".join(
-        f"- {_LABEL_LABELS.get(k, k)}: {'ACTIVADO' if v['activo'] else 'inactivo'} ({v['probabilidad'] * 100:.1f}%)"
+        f"- {_LABEL_LABELS.get(k, k)}: {'ACTIVE' if v['activo'] else 'inactive'} ({v['probabilidad'] * 100:.1f}%)"
         for k, v in prediction.items()
     )
 
     prompt = (
-        "Eres el sistema de análisis de incidentes de un centro de operaciones de seguridad.\n\n"
-        f"LECTURAS DE SENSORES:\n{sensors}\n\n"
-        f"RESULTADO DE DETECCIÓN DE ANOMALÍAS:\n{detections}\n\n"
-        f"SEVERIDAD CALCULADA: {severity}\n\n"
-        "Genera un reporte de incidente conciso y profesional en español.\n"
-        "Responde únicamente con JSON válido con esta estructura exacta:\n"
+        "You are the incident analysis system of a security operations center.\n\n"
+        f"SENSOR READINGS:\n{sensors}\n\n"
+        f"ANOMALY DETECTION RESULT:\n{detections}\n\n"
+        f"COMPUTED SEVERITY: {severity}\n\n"
+        "Generate a concise and professional incident report in English.\n"
+        "Respond only with valid JSON with this exact structure:\n"
         '{"titulo": "...", "resumen": "...", "analisis": "...", '
         '"acciones": ["...", "...", "..."], "riesgo": "..."}'
     )
@@ -97,7 +97,7 @@ def generate_report(prediction: dict, signals: list, feature_names: list) -> dic
         return {
             "severidad": severity,
             "timestamp": timestamp,
-            "titulo": data.get("titulo", "Evento detectado"),
+            "titulo": data.get("titulo", "Event detected"),
             "resumen": data.get("resumen", ""),
             "analisis": data.get("analisis", ""),
             "acciones": data.get("acciones", []),
@@ -107,7 +107,7 @@ def generate_report(prediction: dict, signals: list, feature_names: list) -> dic
         return {
             "severidad": severity,
             "timestamp": timestamp,
-            "titulo": "Error al generar reporte",
+            "titulo": "Error generating report",
             "resumen": str(exc),
             "analisis": "",
             "acciones": [],

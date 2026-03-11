@@ -1,4 +1,4 @@
-"""Métricas para clasificación multi-etiqueta: Hamming Loss y F1 por etiqueta."""
+"""Metrics for multi-label classification: Hamming Loss and per-label F1."""
 
 import numpy as np
 from sklearn.metrics import hamming_loss, f1_score, accuracy_score
@@ -12,11 +12,11 @@ def compute_all_metrics(Y_true: np.ndarray, Y_pred: np.ndarray) -> dict:
         "exact_match_ratio": round(float(accuracy_score(Y_true, Y_pred)), 6),
         "f1_micro": round(float(f1_score(Y_true, Y_pred, average="micro", zero_division=0)), 6),
         "f1_macro": round(float(f1_score(Y_true, Y_pred, average="macro", zero_division=0)), 6),
-        "f1_por_etiqueta": {},
+        "f1_per_label": {},
     }
 
     f1_per_label = f1_score(Y_true, Y_pred, average=None, zero_division=0)
     for i, name in enumerate(LABEL_NAMES):
-        metrics["f1_por_etiqueta"][name] = round(float(f1_per_label[i]), 6)
+        metrics["f1_per_label"][name] = round(float(f1_per_label[i]), 6)
 
     return metrics

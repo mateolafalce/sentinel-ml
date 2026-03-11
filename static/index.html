@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sentinel ML — Centro de Operaciones</title>
+    <title>Sentinel ML — Operations Center</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,17 +13,17 @@
             <span class="header-icon">⬡</span>
             <div>
                 <h1>SENTINEL ML</h1>
-                <span class="header-sub">Centro de Operaciones de Seguridad</span>
+                <span class="header-sub">Security Operations Center</span>
             </div>
         </div>
         <div class="header-status">
             <div class="status-pill" id="pill-dataset">
                 <span class="dot" id="dot-dataset"></span>
-                <span id="status-dataset">Sin datos</span>
+                <span id="status-dataset">No data</span>
             </div>
             <div class="status-pill" id="pill-model">
                 <span class="dot" id="dot-model"></span>
-                <span id="status-model">Sin entrenar</span>
+                <span id="status-model">Not trained</span>
             </div>
             <div class="header-clock" id="header-clock">--:--:--</div>
         </div>
@@ -32,33 +32,33 @@
     <!-- Setup Panel -->
     <details class="setup-panel" open>
         <summary>
-            <span>Configuración del Sistema</span>
+            <span>System Configuration</span>
             <span class="setup-toggle-hint">▾</span>
         </summary>
         <div class="setup-body">
             <!-- Data source tabs -->
             <div class="setup-section">
                 <div class="tabs">
-                    <button class="tab active" onclick="switchTab('synthetic')">Datos Sintéticos</button>
+                    <button class="tab active" onclick="switchTab('synthetic')">Synthetic Data</button>
                     <button class="tab" onclick="switchTab('ucf')">UCF-Crime (YOLO)</button>
                 </div>
 
                 <div id="tab-synthetic" class="tab-content">
                     <div class="form-row">
-                        <label>Muestras:</label>
+                        <label>Samples:</label>
                         <input type="number" id="n-samples" value="2000" min="100" max="50000">
-                        <button onclick="generateDataset()">Generar Dataset</button>
+                        <button onclick="generateDataset()">Generate Dataset</button>
                     </div>
                 </div>
 
                 <div id="tab-ucf" class="tab-content hidden">
                     <div class="form-row">
-                        <button onclick="ucfSetup()">Preparar Carpetas</button>
-                        <button onclick="ucfCheckStatus()">Ver Estado</button>
-                        <button onclick="ucfExtract()">Extraer Features</button>
+                        <button onclick="ucfSetup()">Prepare Folders</button>
+                        <button onclick="ucfCheckStatus()">View Status</button>
+                        <button onclick="ucfExtract()">Extract Features</button>
                         <label>Frames:</label>
                         <input type="number" id="frame-interval" value="30" min="1" max="120" style="width:70px">
-                        <label>Máx:</label>
+                        <label>Max:</label>
                         <input type="number" id="max-frames" value="60" min="10" max="300" style="width:70px">
                     </div>
                     <div id="extraction-progress" class="progress-container hidden">
@@ -72,14 +72,14 @@
             <!-- Train -->
             <div class="setup-section setup-train">
                 <div class="form-row">
-                    <label>Modelo:</label>
+                    <label>Model:</label>
                     <select id="model-select">
                         <option value="sklearn">Random Forest (Sklearn)</option>
-                        <option value="pytorch">Red Neuronal (PyTorch)</option>
+                        <option value="pytorch">Neural Network (PyTorch)</option>
                     </select>
                     <label>Epochs:</label>
                     <input type="number" id="epochs" value="50" min="10" max="500" style="width:80px">
-                    <button onclick="trainModel()">Entrenar Modelo</button>
+                    <button onclick="trainModel()">Train Model</button>
                 </div>
                 <div id="train-result" class="result-small hidden"></div>
             </div>
@@ -92,31 +92,31 @@
     <main class="ops-grid">
         <!-- Left: Signals -->
         <section class="panel" id="signals-panel">
-            <h2 class="panel-title">Señales del Sistema</h2>
+            <h2 class="panel-title">System Signals</h2>
             <div id="signals-list"></div>
             <button class="btn-analyze" id="analyze-btn" onclick="analyze()">
-                Analizar Evento
+                Analyze Event
             </button>
         </section>
 
         <!-- Center: Detection -->
         <section class="panel" id="detection-panel">
-            <h2 class="panel-title">Detección de Anomalías</h2>
+            <h2 class="panel-title">Anomaly Detection</h2>
             <div id="labels-display" class="labels-grid">
-                <div class="placeholder-msg">Sin detección activa</div>
+                <div class="placeholder-msg">No active detection</div>
             </div>
         </section>
 
         <!-- Right: Report -->
         <section class="panel" id="report-panel">
             <h2 class="panel-title">
-                Reporte de Incidente
-                <span class="live-badge">IA</span>
+                Incident Report
+                <span class="live-badge">AI</span>
             </h2>
             <div id="report-content">
                 <div class="placeholder-msg">
                     <span class="placeholder-icon">⬡</span>
-                    <p>Ejecuta un análisis para generar un reporte con IA</p>
+                    <p>Run an analysis to generate an AI-powered report</p>
                 </div>
             </div>
         </section>
@@ -124,21 +124,21 @@
 
     <!-- Incident Log -->
     <section class="card incidents-card">
-        <h2 class="panel-title">Historial de Incidentes</h2>
+        <h2 class="panel-title">Incident History</h2>
         <div id="incidents-container">
-            <div class="placeholder-msg">No hay incidentes registrados</div>
+            <div class="placeholder-msg">No incidents recorded</div>
         </div>
     </section>
 
     <footer>
-        <p>Sentinel ML &mdash; Detección de Anomalías + Análisis con IA (OpenAI GPT-4o)</p>
+        <p>Sentinel ML &mdash; Anomaly Detection + AI Analysis (OpenAI GPT-4o)</p>
     </footer>
 
     <!-- Loading overlay -->
     <div id="loading" class="loading hidden">
         <div class="loading-box">
             <div class="spinner"></div>
-            <p id="loading-text">Procesando...</p>
+            <p id="loading-text">Processing...</p>
         </div>
     </div>
 

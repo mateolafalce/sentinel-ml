@@ -32,7 +32,7 @@ Signals (8) → ML Classifier → Prediction (4 labels)
                                       ↓
                               OpenAI GPT-4o
                                       ↓
-                         Incident Report (ES) + Log
+                         Incident Report (EN) + Log
 ```
 
 **Inputs (8 features):** `sensor_movimiento`, `camara_activa`, `hora_nocturna`, `zona_riesgo`, `sensor_puerta`, `sensor_ventana`, `nivel_ruido`, `historico_incidentes`
@@ -42,7 +42,7 @@ Signals (8) → ML Classifier → Prediction (4 labels)
 ### Backend (`src/`)
 
 - **`server.py`** — Flask REST API. Globals: `sklearn_model`, `pytorch_model`, `X_data`, `Y_data`, `incidents` (list, max 50). No persistence; state resets on restart.
-- **`llm/reporter.py`** — Calls OpenAI GPT-4o with sensor readings + prediction results. Computes severity (NORMAL/BAJO/MEDIO/ALTO/CRÍTICO) and returns structured report dict.
+- **`llm/reporter.py`** — Calls OpenAI GPT-4o with sensor readings + prediction results. Computes severity (NORMAL/LOW/MEDIUM/HIGH/CRITICAL) and returns structured report dict.
 - **`data/generator.py`** — Generates synthetic data using deterministic rules with 5% label noise. `FEATURE_NAMES` and `LABEL_NAMES` are the canonical source of truth.
 - **`data/feature_extractor.py`** — YOLOv8-based feature extraction from video frames. `EXTRACTED_FEATURE_NAMES` is the canonical source for UCF-Crime features.
 - **`data/ucf_crime.py`** — UCF-Crime dataset management; maps 14 anomaly categories to 4 labels.

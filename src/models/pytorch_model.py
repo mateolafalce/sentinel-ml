@@ -1,4 +1,4 @@
-"""Modelo PyTorch con sigmoid output para clasificación multi-etiqueta."""
+"""PyTorch model with sigmoid output for multi-label classification."""
 
 import numpy as np
 import torch

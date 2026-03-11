@@ -1,4 +1,4 @@
-"""Extracción de features tabulares desde videos usando YOLOv8."""
+"""Tabular feature extraction from videos using YOLOv8."""
 
 import cv2
 import numpy as np
@@ -7,16 +7,16 @@ from ultralytics import YOLO
 
 from src.data.ucf_crime import CATEGORY_TO_LABELS, CATEGORIES
 
-# Features extraídas por segmento de video
+# Features extracted per video segment
 EXTRACTED_FEATURE_NAMES = [
-    "avg_personas",           # Promedio de personas detectadas por frame
-    "max_personas",           # Máximo de personas en un frame
-    "avg_confianza_persona",  # Confianza promedio de detección de personas
-    "area_persona_max",       # Área máxima de bbox de persona / área del frame
-    "intensidad_movimiento",  # Diferencia promedio entre frames consecutivos
-    "clases_unicas",          # Número de clases distintas detectadas
-    "detecciones_promedio",   # Promedio total de detecciones por frame
-    "velocidad_persona",      # Desplazamiento estimado de centroide entre frames
+    "avg_personas",           # Average number of persons detected per frame
+    "max_personas",           # Maximum number of persons in a single frame
+    "avg_confianza_persona",  # Average confidence of person detections
+    "area_persona_max",       # Max person bounding-box area / frame area
+    "intensidad_movimiento",  # Average difference between consecutive frames
+    "clases_unicas",          # Number of distinct classes detected
+    "detecciones_promedio",   # Average total detections per frame
+    "velocidad_persona",      # Estimated centroid displacement between frames
 ]
 
 _model = None
@@ -34,15 +34,15 @@ def extract_features_from_video(
     frame_interval: int = 30,
     max_frames: int = 60,
 ) -> np.ndarray | None:
-    """Extrae 8 features tabulares de un video usando YOLO.
+    """Extracts 8 tabular features from a video using YOLO.
 
     Args:
-        video_path: Ruta al archivo de video.
-        frame_interval: Procesar cada N frames (30 ≈ 1fps para video 30fps).
-        max_frames: Máximo de frames a procesar por video.
+        video_path: Path to the video file.
+        frame_interval: Process every N frames (30 ≈ 1fps for 30fps video).
+        max_frames: Maximum number of frames to process per video.
 
     Returns:
-        Array de 8 features o None si el video no se puede abrir.
+        Array of 8 features, or None if the video cannot be opened.
     """
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
@@ -74,14 +74,14 @@ def extract_features_from_video(
             frame_idx += 1
             continue
 
-        # Movimiento (diferencia entre frames)
+        # Motion (difference between frames)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         if prev_gray is not None:
             diff = cv2.absdiff(prev_gray, gray)
             motion_values.append(float(diff.mean()) / 255.0)
         prev_gray = gray
 
-        # YOLO detección
+        # YOLO detection
         results = model(frame, verbose=False)[0]
         boxes = results.boxes
 
@@ -117,7 +117,7 @@ def extract_features_from_video(
     if processed == 0:
         return None
 
-    # Calcular velocidad de persona (desplazamiento de centroide entre frames)
+    # Compute person speed (centroid displacement between frames)
     speeds = []
     for i in range(1, len(person_centroids)):
         if person_centroids[i] is not None and person_centroids[i - 1] is not None:
@@ -146,16 +146,16 @@ def process_dataset(
     max_frames: int = 60,
     progress_callback=None,
 ) -> tuple[np.ndarray, np.ndarray, list[str]]:
-    """Procesa una lista de videos y retorna features + labels.
+    """Processes a list of videos and returns features + labels.
 
     Args:
-        video_list: Lista de (ruta_video, categoría).
-        frame_interval: Procesar cada N frames.
-        max_frames: Máximo de frames por video.
-        progress_callback: Función llamada con (current, total, video_name).
+        video_list: List of (video_path, category).
+        frame_interval: Process every N frames.
+        max_frames: Maximum number of frames per video.
+        progress_callback: Function called with (current, total, video_name).
 
     Returns:
-        (X, Y, video_names) — features, labels, nombres de archivos procesados.
+        (X, Y, video_names) — features, labels, names of processed files.
     """
     X_list = []
     Y_list = []

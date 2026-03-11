@@ -438,11 +438,11 @@ button:disabled { background: #333; cursor: not-allowed; }
     border-radius: 4px;
 }
 
-.sev-normal  { background: #55637a22; color: var(--text3);  border: 1px solid var(--text3); }
-.sev-bajo    { background: #3498db22; color: var(--blue);   border: 1px solid var(--blue); }
-.sev-medio   { background: #f1c40f22; color: var(--yellow); border: 1px solid var(--yellow); }
-.sev-alto    { background: #e67e2222; color: var(--orange); border: 1px solid var(--orange); }
-.sev-critico { background: #e74c3c22; color: var(--red);    border: 1px solid var(--red); }
+.sev-normal   { background: #55637a22; color: var(--text3);  border: 1px solid var(--text3); }
+.sev-low      { background: #3498db22; color: var(--blue);   border: 1px solid var(--blue); }
+.sev-medium   { background: #f1c40f22; color: var(--yellow); border: 1px solid var(--yellow); }
+.sev-high     { background: #e67e2222; color: var(--orange); border: 1px solid var(--orange); }
+.sev-critical { background: #e74c3c22; color: var(--red);    border: 1px solid var(--red); }
 
 /* ── Incidents Card ──────────────────────────────────────────────────────── */
 .incidents-card {

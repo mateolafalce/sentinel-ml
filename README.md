@@ -1,12 +1,12 @@
-# Sentinel ML — Centro de Operaciones de Seguridad
+# Sentinel ML — Security Operations Center
 
-Sistema de detección de anomalías en eventos de seguridad con generación de reportes de incidentes usando IA (OpenAI GPT-4o). Dashboard web para operadores de seguridad.
+Multi-label security anomaly detection system with AI-powered incident report generation (OpenAI GPT-4o). Web dashboard for security operators.
 
-## Requisitos
+## Requirements
 
 - Python 3.11+
 - [uv](https://docs.astral.sh/uv/)
-- API key de OpenAI
+- OpenAI API key
 
 ## Setup
 
@@ -17,28 +17,28 @@ uv run python -m src.server
 # → http://localhost:5000
 ```
 
-## Flujo de uso
+## Usage flow
 
-1. **Generar dataset** — datos sintéticos (o extraer features de videos UCF-Crime con YOLO)
-2. **Entrenar modelo** — Random Forest (sklearn) o Red Neuronal (PyTorch)
-3. **Analizar evento** — ajusta los 8 sliders de señales y pulsa "Analizar Evento"
-4. El sistema ejecuta la predicción ML y genera un **reporte de incidente con GPT-4o**
-5. El reporte queda registrado en el **historial de incidentes**
+1. **Generate dataset** — synthetic data (or extract features from UCF-Crime videos with YOLO)
+2. **Train model** — Random Forest (sklearn) or Neural Network (PyTorch)
+3. **Analyze event** — adjust the 8 signal sliders and click "Analyze Event"
+4. The system runs the ML prediction and generates an **incident report with GPT-4o**
+5. The report is recorded in the **incident history**
 
-## Arquitectura
+## Architecture
 
 ```
-Señales (8) → Clasificador ML → Predicción (4 labels)
-                                       ↓
-                               OpenAI GPT-4o
-                                       ↓
-                          Reporte de Incidente (ES)
-                          severidad / análisis / acciones
+Signals (8) → ML Classifier → Prediction (4 labels)
+                                      ↓
+                              OpenAI GPT-4o
+                                      ↓
+                         Incident Report (EN)
+                         severity / analysis / actions
 ```
 
 ### Inputs (8 features)
 
-**Datos sintéticos:** `sensor_movimiento`, `camara_activa`, `hora_nocturna`, `zona_riesgo`, `sensor_puerta`, `sensor_ventana`, `nivel_ruido`, `historico_incidentes`
+**Synthetic data:** `sensor_movimiento`, `camara_activa`, `hora_nocturna`, `zona_riesgo`, `sensor_puerta`, `sensor_ventana`, `nivel_ruido`, `historico_incidentes`
 
 **UCF-Crime (YOLO):** `avg_personas`, `max_personas`, `avg_confianza_persona`, `area_persona_max`, `intensidad_movimiento`, `clases_unicas`, `detecciones_promedio`, `velocidad_persona`
 
@@ -46,49 +46,49 @@ Señales (8) → Clasificador ML → Predicción (4 labels)
 
 `intrusion_probable`, `requiere_verificacion_visual`, `notificar_propietario`, `despachar_movil`
 
-### Severidad calculada
+### Computed severity
 
-| Severidad | Condición |
-|-----------|-----------|
-| NORMAL    | 0 labels activos |
-| BAJO      | 1 label activo (no intrusión) |
-| MEDIO     | intrusion_probable solo, o 2+ labels sin despacho |
-| ALTO      | intrusion_probable + otro label |
-| CRÍTICO   | despachar_movil activo |
+| Severity | Condition |
+|----------|-----------|
+| NORMAL   | 0 active labels |
+| LOW      | 1 active label (no intrusion) |
+| MEDIUM   | intrusion_probable only, or 2+ labels without dispatch |
+| HIGH     | intrusion_probable + another label |
+| CRITICAL | despachar_movil active |
 
-## Estructura
+## Structure
 
 ```
 src/
 ├── server.py              # Flask REST API
 ├── llm/
-│   └── reporter.py        # Integración OpenAI GPT-4o
+│   └── reporter.py        # OpenAI GPT-4o integration
 ├── data/
-│   ├── generator.py       # Dataset sintético
-│   ├── feature_extractor.py  # Extracción YOLO desde video
-│   └── ucf_crime.py       # Gestión dataset UCF-Crime
+│   ├── generator.py       # Synthetic dataset
+│   ├── feature_extractor.py  # YOLO feature extraction from video
+│   └── ucf_crime.py       # UCF-Crime dataset management
 ├── models/
 │   ├── sklearn_model.py   # RandomForest MultiOutputClassifier
-│   └── pytorch_model.py   # MLP 3 capas, BCEWithLogitsLoss
+│   └── pytorch_model.py   # 3-layer MLP, BCEWithLogitsLoss
 └── metrics.py             # hamming_loss, f1, exact_match
 
 static/
 ├── index.html             # SOC Dashboard (SPA)
-├── app.js                 # Lógica del cliente
-└── style.css              # Tema oscuro estilo SOC
+├── app.js                 # Client logic
+└── style.css              # Dark SOC-style theme
 ```
 
 ## API
 
-| Method | Path | Descripción |
+| Method | Path | Description |
 |--------|------|-------------|
-| GET  | `/api/info`               | Estado del sistema, features, labels |
-| POST | `/api/generate`           | Generar dataset sintético `{ n_samples }` |
-| POST | `/api/train`              | Entrenar modelo `{ model, epochs? }` |
-| POST | `/api/predict`            | Predicción raw `{ model, signals }` |
-| POST | `/api/report`             | Predicción + reporte LLM `{ model, signals }` |
-| GET  | `/api/incidents`          | Historial de incidentes (máx 50) |
-| GET  | `/api/ucf/status`         | Estado del dataset UCF-Crime |
-| POST | `/api/ucf/setup`          | Crear estructura de carpetas |
-| POST | `/api/ucf/extract`        | Extraer features con YOLO (async) |
-| GET  | `/api/ucf/extract/status` | Progreso de extracción |
+| GET  | `/api/info`               | System status, features, labels |
+| POST | `/api/generate`           | Generate synthetic dataset `{ n_samples }` |
+| POST | `/api/train`              | Train model `{ model, epochs? }` |
+| POST | `/api/predict`            | Raw prediction `{ model, signals }` |
+| POST | `/api/report`             | Prediction + LLM report `{ model, signals }` |
+| GET  | `/api/incidents`          | Incident history (max 50) |
+| GET  | `/api/ucf/status`         | UCF-Crime dataset status |
+| POST | `/api/ucf/setup`          | Create folder structure |
+| POST | `/api/ucf/extract`        | Extract features with YOLO (async) |
+| GET  | `/api/ucf/extract/status` | Extraction progress |

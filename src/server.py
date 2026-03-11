@@ -1,4 +1,4 @@
-"""Servidor Flask para la interfaz gráfica de Sentinel ML."""
+"""Flask server for the Sentinel ML graphical interface."""
 
 import threading
 import numpy as np
@@ -16,14 +16,14 @@ from src.llm.reporter import generate_report
 
 app = Flask(__name__, static_folder="../static")
 
-# Estado global
+# Global state
 sklearn_model = SklearnMultiLabel()
 pytorch_model = PyTorchMultiLabel()
 X_data, Y_data = None, None
-data_source = None  # "synthetic" o "ucf-crime"
-incidents = []  # historial de incidentes (máx 50)
+data_source = None  # "synthetic" or "ucf-crime"
+incidents = []  # incident history (max 50)
 
-# Estado de extracción en segundo plano
+# Background extraction state
 extraction_status = {
     "running": False,
     "progress": 0,
@@ -68,7 +68,7 @@ def generate():
     data_source = "synthetic"
 
     return jsonify({
-        "mensaje": f"Dataset sintético generado con {n_samples} muestras",
+        "mensaje": f"Synthetic dataset generated with {n_samples} samples",
         "source": "synthetic",
         "n_samples": n_samples,
         "n_features": X_data.shape[1],
@@ -90,7 +90,7 @@ def ucf_status():
 def ucf_setup():
     path = setup_directories()
     return jsonify({
-        "mensaje": "Directorios creados. Coloca los videos en las subcarpetas correspondientes.",
+        "mensaje": "Directories created. Place videos in the corresponding subfolders.",
         "path": path,
     })
 
@@ -100,7 +100,7 @@ def ucf_extract():
     global extraction_status
 
     if extraction_status["running"]:
-        return jsonify({"error": "Ya hay una extracción en progreso"}), 409
+        return jsonify({"error": "An extraction is already in progress"}), 409
 
     body = request.get_json(silent=True) or {}
     frame_interval = body.get("frame_interval", 30)
@@ -109,7 +109,7 @@ def ucf_extract():
     videos = get_video_paths()
     if not videos:
         return jsonify({
-            "error": "No se encontraron videos. Usa /api/ucf/setup y coloca videos en las carpetas."
+            "error": "No videos found. Use /api/ucf/setup and place videos in the folders."
         }), 400
 
     extraction_status = {
@@ -137,7 +137,7 @@ def ucf_extract():
             )
 
             if len(X) == 0:
-                extraction_status["error"] = "No se pudieron procesar videos"
+                extraction_status["error"] = "No videos could be processed"
             else:
                 X_data = X
                 Y_data = Y
@@ -154,7 +154,7 @@ def ucf_extract():
     thread.start()
 
     return jsonify({
-        "mensaje": f"Extracción iniciada para {len(videos)} videos",
+        "mensaje": f"Extraction started for {len(videos)} videos",
         "total_videos": len(videos),
     })
 
@@ -177,7 +177,7 @@ def ucf_extract_status():
 def train():
     global X_data, Y_data
     if X_data is None:
-        return jsonify({"error": "Primero genera o extrae un dataset"}), 400
+        return jsonify({"error": "Generate or extract a dataset first"}), 400
 
     body = request.get_json(silent=True) or {}
     model_type = body.get("model", "sklearn")
@@ -188,7 +188,7 @@ def train():
         epochs = body.get("epochs", 50)
         metrics = pytorch_model.train(X_data, Y_data, epochs=epochs)
     else:
-        return jsonify({"error": f"Modelo no soportado: {model_type}"}), 400
+        return jsonify({"error": f"Unsupported model: {model_type}"}), 400
 
     metrics["data_source"] = data_source
     return jsonify({"model": model_type, "metrics": metrics})
@@ -198,58 +198,58 @@ def train():
 def predict():
     body = request.get_json()
     if not body or "signals" not in body:
-        return jsonify({"error": "Se requiere 'signals' en el body"}), 400
+        return jsonify({"error": "'signals' is required in the request body"}), 400
 
     model_type = body.get("model", "sklearn")
     signals = body["signals"]
 
     expected_features = EXTRACTED_FEATURE_NAMES if data_source == "ucf-crime" else FEATURE_NAMES
     if len(signals) != len(expected_features):
-        return jsonify({"error": f"Se requieren {len(expected_features)} señales"}), 400
+        return jsonify({"error": f"{len(expected_features)} signals are required"}), 400
 
     X = np.array([signals], dtype=float)
 
     if model_type == "sklearn":
         if not sklearn_model.trained:
-            return jsonify({"error": "El modelo sklearn no ha sido entrenado"}), 400
+            return jsonify({"error": "The sklearn model has not been trained"}), 400
         results = sklearn_model.predict(X)
     elif model_type == "pytorch":
         if not pytorch_model.trained:
-            return jsonify({"error": "El modelo pytorch no ha sido entrenado"}), 400
+            return jsonify({"error": "The pytorch model has not been trained"}), 400
         results = pytorch_model.predict(X)
     else:
-        return jsonify({"error": f"Modelo no soportado: {model_type}"}), 400
+        return jsonify({"error": f"Unsupported model: {model_type}"}), 400
 
     return jsonify({"model": model_type, "prediccion": results[0]})
 
 
 @app.route("/api/report", methods=["POST"])
 def report():
-    """Ejecuta predicción y genera reporte de incidente con LLM."""
+    """Runs prediction and generates an incident report with the LLM."""
     global incidents
     body = request.get_json()
     if not body or "signals" not in body:
-        return jsonify({"error": "Se requiere 'signals' en el body"}), 400
+        return jsonify({"error": "'signals' is required in the request body"}), 400
 
     model_type = body.get("model", "sklearn")
     signals = body["signals"]
 
     feature_names = EXTRACTED_FEATURE_NAMES if data_source == "ucf-crime" else FEATURE_NAMES
     if len(signals) != len(feature_names):
-        return jsonify({"error": f"Se requieren {len(feature_names)} señales"}), 400
+        return jsonify({"error": f"{len(feature_names)} signals are required"}), 400
 
     X = np.array([signals], dtype=float)
 
     if model_type == "sklearn":
         if not sklearn_model.trained:
-            return jsonify({"error": "El modelo sklearn no ha sido entrenado"}), 400
+            return jsonify({"error": "The sklearn model has not been trained"}), 400
         results = sklearn_model.predict(X)
     elif model_type == "pytorch":
         if not pytorch_model.trained:
-            return jsonify({"error": "El modelo pytorch no ha sido entrenado"}), 400
+            return jsonify({"error": "The pytorch model has not been trained"}), 400
         results = pytorch_model.predict(X)
     else:
-        return jsonify({"error": f"Modelo no soportado: {model_type}"}), 400
+        return jsonify({"error": f"Unsupported model: {model_type}"}), 400
 
     prediction = results[0]
     report_data = generate_report(prediction, signals, feature_names)

@@ -1,38 +1,38 @@
 const SYNTHETIC_SIGNALS = {
-    sensor_movimiento:     { label: "Sensor Movimiento",       type: "binary" },
-    camara_activa:         { label: "Cámara Activa",           type: "binary" },
-    hora_nocturna:         { label: "Hora Nocturna",           type: "binary" },
-    zona_riesgo:           { label: "Zona de Riesgo",          type: "binary" },
-    sensor_puerta:         { label: "Sensor Puerta",           type: "binary" },
-    sensor_ventana:        { label: "Sensor Ventana",          type: "binary" },
-    nivel_ruido:           { label: "Nivel de Ruido",          type: "range", min: 0, max: 1, step: 0.01, default: 0.5 },
-    historico_incidentes:  { label: "Histórico Incidentes",    type: "range", min: 0, max: 1, step: 0.01, default: 0.5 },
+    sensor_movimiento:     { label: "Motion Sensor",         type: "binary" },
+    camara_activa:         { label: "Active Camera",         type: "binary" },
+    hora_nocturna:         { label: "Night-time",            type: "binary" },
+    zona_riesgo:           { label: "Risk Zone",             type: "binary" },
+    sensor_puerta:         { label: "Door Sensor",           type: "binary" },
+    sensor_ventana:        { label: "Window Sensor",         type: "binary" },
+    nivel_ruido:           { label: "Noise Level",           type: "range", min: 0, max: 1, step: 0.01, default: 0.5 },
+    historico_incidentes:  { label: "Incident History",      type: "range", min: 0, max: 1, step: 0.01, default: 0.5 },
 };
 
 const UCF_SIGNALS = {
-    avg_personas:           { label: "Prom. Personas",         type: "range", min: 0, max: 10,  step: 0.1,  default: 1 },
-    max_personas:           { label: "Máx. Personas",          type: "range", min: 0, max: 20,  step: 1,    default: 2 },
-    avg_confianza_persona:  { label: "Confianza Persona",      type: "range", min: 0, max: 1,   step: 0.01, default: 0.5 },
-    area_persona_max:       { label: "Área Persona Máx.",      type: "range", min: 0, max: 1,   step: 0.01, default: 0.1 },
-    intensidad_movimiento:  { label: "Intensidad Movimiento",  type: "range", min: 0, max: 1,   step: 0.01, default: 0.3 },
-    clases_unicas:          { label: "Clases Únicas",          type: "range", min: 0, max: 20,  step: 1,    default: 3 },
-    detecciones_promedio:   { label: "Detecciones Prom.",      type: "range", min: 0, max: 30,  step: 0.5,  default: 3 },
-    velocidad_persona:      { label: "Velocidad Persona",      type: "range", min: 0, max: 1,   step: 0.01, default: 0.1 },
+    avg_personas:           { label: "Avg. Persons",          type: "range", min: 0, max: 10,  step: 0.1,  default: 1 },
+    max_personas:           { label: "Max. Persons",          type: "range", min: 0, max: 20,  step: 1,    default: 2 },
+    avg_confianza_persona:  { label: "Person Confidence",     type: "range", min: 0, max: 1,   step: 0.01, default: 0.5 },
+    area_persona_max:       { label: "Max. Person Area",      type: "range", min: 0, max: 1,   step: 0.01, default: 0.1 },
+    intensidad_movimiento:  { label: "Motion Intensity",      type: "range", min: 0, max: 1,   step: 0.01, default: 0.3 },
+    clases_unicas:          { label: "Unique Classes",        type: "range", min: 0, max: 20,  step: 1,    default: 3 },
+    detecciones_promedio:   { label: "Avg. Detections",       type: "range", min: 0, max: 30,  step: 0.5,  default: 3 },
+    velocidad_persona:      { label: "Person Speed",          type: "range", min: 0, max: 1,   step: 0.01, default: 0.1 },
 };
 
 const LABEL_DISPLAY = {
-    intrusion_probable:             "Intrusión Probable",
-    requiere_verificacion_visual:   "Verificación Visual",
-    notificar_propietario:          "Notificar Propietario",
-    despachar_movil:                "Despachar Móvil",
+    intrusion_probable:             "Probable Intrusion",
+    requiere_verificacion_visual:   "Visual Verification",
+    notificar_propietario:          "Notify Owner",
+    despachar_movil:                "Dispatch Unit",
 };
 
 const SEVERITY_CLASS = {
     NORMAL:   "sev-normal",
-    BAJO:     "sev-bajo",
-    MEDIO:    "sev-medio",
-    ALTO:     "sev-alto",
-    CRÍTICO:  "sev-critico",
+    LOW:      "sev-low",
+    MEDIUM:   "sev-medium",
+    HIGH:     "sev-high",
+    CRITICAL: "sev-critical",
 };
 
 let datasetReady = false;
@@ -50,7 +50,7 @@ function init() {
 
 function startClock() {
     const el = document.getElementById("header-clock");
-    const tick = () => { el.textContent = new Date().toLocaleTimeString("es-ES"); };
+    const tick = () => { el.textContent = new Date().toLocaleTimeString("en-US"); };
     tick();
     setInterval(tick, 1000);
 }
@@ -66,9 +66,9 @@ async function checkStatus() {
         setDot("dataset", data.n_samples > 0);
         setDot("model", trained);
         document.getElementById("status-dataset").textContent =
-            data.n_samples > 0 ? `${data.n_samples} muestras (${data.data_source})` : "Sin datos";
+            data.n_samples > 0 ? `${data.n_samples} samples (${data.data_source})` : "No data";
         document.getElementById("status-model").textContent =
-            trained ? "Entrenado" : "Sin entrenar";
+            trained ? "Trained" : "Not trained";
 
         if (data.n_samples > 0) {
             datasetReady = true;
@@ -78,7 +78,7 @@ async function checkStatus() {
             }
         }
     } catch {
-        // servidor no listo aún
+        // server not ready yet
     }
 }
 
@@ -134,7 +134,7 @@ function switchTab(tab) {
 
 // ── Loading ───────────────────────────────────────────────────────────────────
 
-function setLoading(on, text = "Procesando...") {
+function setLoading(on, text = "Processing...") {
     document.getElementById("loading").classList.toggle("hidden", !on);
     document.getElementById("loading-text").textContent = text;
 }
@@ -148,7 +148,7 @@ async function apiCall(endpoint, body = {}, method = "POST") {
         if (method !== "GET") opts.body = JSON.stringify(body);
         const res = await fetch(endpoint, opts);
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Error del servidor");
+        if (!res.ok) throw new Error(data.error || "Server error");
         return data;
     } catch (err) {
         alert(err.message);
@@ -168,9 +168,9 @@ async function generateDataset() {
     datasetReady = true;
     currentSource = "synthetic";
     setDot("dataset", true);
-    document.getElementById("status-dataset").textContent = `${data.n_samples} muestras (sintético)`;
+    document.getElementById("status-dataset").textContent = `${data.n_samples} samples (synthetic)`;
 
-    let html = `Dataset generado: <strong>${data.n_samples} muestras</strong>`;
+    let html = `Dataset generated: <strong>${data.n_samples} samples</strong>`;
     showResult("setup-result", html);
     buildSignalControls();
 }
@@ -234,8 +234,8 @@ function pollExtraction() {
                     currentSource = "ucf";
                     setDot("dataset", true);
                     document.getElementById("status-dataset").textContent =
-                        `${s.n_samples} muestras (UCF-Crime)`;
-                    showResult("setup-result", `Extracción completada: <strong>${s.n_samples} muestras</strong>`);
+                        `${s.n_samples} samples (UCF-Crime)`;
+                    showResult("setup-result", `Extraction complete: <strong>${s.n_samples} samples</strong>`);
                     buildSignalControls();
                 }
             }
@@ -246,7 +246,7 @@ function pollExtraction() {
 // ── Train ─────────────────────────────────────────────────────────────────────
 
 async function trainModel() {
-    if (!datasetReady) { alert("Primero genera o extrae un dataset"); return; }
+    if (!datasetReady) { alert("Generate or extract a dataset first"); return; }
 
     const modelType = document.getElementById("model-select").value;
     const body = { model: modelType };
@@ -254,12 +254,12 @@ async function trainModel() {
         body.epochs = parseInt(document.getElementById("epochs").value);
     }
 
-    setLoading(true, "Entrenando modelo...");
+    setLoading(true, "Training model...");
     const data = await apiCall("/api/train", body);
     if (!data) return;
 
     setDot("model", true);
-    document.getElementById("status-model").textContent = `${modelType} entrenado`;
+    document.getElementById("status-model").textContent = `${modelType} trained`;
 
     const m = data.metrics;
     let html = `<strong>${modelType.toUpperCase()}</strong>`;
@@ -279,7 +279,7 @@ async function analyze() {
         signals.push(parseFloat(document.getElementById(`signal-${key}`).value));
     }
 
-    setLoading(true, "Analizando evento y generando reporte con IA...");
+    setLoading(true, "Analyzing event and generating AI report...");
     const data = await apiCall("/api/report", { model: modelType, signals });
     setLoading(false);
     if (!data) return;
@@ -301,7 +301,7 @@ function renderLabels(prediction) {
         card.innerHTML = `
             <div class="lc-name">${LABEL_DISPLAY[label] || label}</div>
             <div class="lc-prob">${(info.probabilidad * 100).toFixed(1)}%</div>
-            <div class="lc-status">${info.activo ? "ACTIVADO" : "inactivo"}</div>
+            <div class="lc-status">${info.activo ? "ACTIVE" : "inactive"}</div>
         `;
         grid.appendChild(card);
     }
@@ -311,7 +311,7 @@ function renderLabels(prediction) {
 
 function renderReport(report, modelType) {
     const sevClass = SEVERITY_CLASS[report.severidad] || "sev-normal";
-    const ts = new Date(report.timestamp).toLocaleTimeString("es-ES");
+    const ts = new Date(report.timestamp).toLocaleTimeString("en-US");
 
     const actionsHtml = report.acciones?.length
         ? `<ol class="report-actions">${report.acciones.map(a => `<li>${a}</li>`).join("")}</ol>`
@@ -324,10 +324,10 @@ function renderReport(report, modelType) {
             <span class="report-model-tag">${modelType}</span>
         </div>
         <h3 class="report-title">${report.titulo}</h3>
-        ${report.resumen  ? `<div class="report-block"><span class="report-label">Resumen</span><p>${report.resumen}</p></div>`   : ""}
-        ${report.analisis ? `<div class="report-block"><span class="report-label">Análisis Técnico</span><p>${report.analisis}</p></div>` : ""}
-        ${actionsHtml     ? `<div class="report-block"><span class="report-label">Acciones Recomendadas</span>${actionsHtml}</div>` : ""}
-        ${report.riesgo   ? `<div class="report-block"><span class="report-label">Evaluación de Riesgo</span><p>${report.riesgo}</p></div>`   : ""}
+        ${report.resumen  ? `<div class="report-block"><span class="report-label">Summary</span><p>${report.resumen}</p></div>`   : ""}
+        ${report.analisis ? `<div class="report-block"><span class="report-label">Technical Analysis</span><p>${report.analisis}</p></div>` : ""}
+        ${actionsHtml     ? `<div class="report-block"><span class="report-label">Recommended Actions</span>${actionsHtml}</div>` : ""}
+        ${report.riesgo   ? `<div class="report-block"><span class="report-label">Risk Assessment</span><p>${report.riesgo}</p></div>`   : ""}
         ${report.error    ? `<div class="report-block error-block"><span class="report-label">Error</span><p>${report.error}</p></div>` : ""}
     `;
 }
@@ -344,18 +344,18 @@ async function loadIncidents() {
 function renderIncidentLog(incidents) {
     const container = document.getElementById("incidents-container");
     if (!incidents.length) {
-        container.innerHTML = '<div class="placeholder-msg">No hay incidentes registrados</div>';
+        container.innerHTML = '<div class="placeholder-msg">No incidents recorded</div>';
         return;
     }
 
     const rows = [...incidents].reverse().map(inc => {
         const r = inc.report;
         const sc = SEVERITY_CLASS[r.severidad] || "sev-normal";
-        const ts = new Date(r.timestamp).toLocaleTimeString("es-ES");
+        const ts = new Date(r.timestamp).toLocaleTimeString("en-US");
         const active = Object.entries(inc.prediction)
             .filter(([, v]) => v.activo)
             .map(([k]) => LABEL_DISPLAY[k] || k)
-            .join(", ") || "ninguno";
+            .join(", ") || "none";
         return `
             <tr>
                 <td><span class="severity-badge ${sc}">${r.severidad}</span></td>
@@ -370,11 +370,11 @@ function renderIncidentLog(incidents) {
         <table class="incident-table">
             <thead>
                 <tr>
-                    <th>Severidad</th>
-                    <th>Hora</th>
-                    <th>Título</th>
-                    <th>Labels Activos</th>
-                    <th>Modelo</th>
+                    <th>Severity</th>
+                    <th>Time</th>
+                    <th>Title</th>
+                    <th>Active Labels</th>
+                    <th>Model</th>
                 </tr>
             </thead>
             <tbody>${rows}</tbody>

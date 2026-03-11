@@ -1,11 +1,11 @@
-"""Gestión del dataset UCF-Crime y mapeo de categorías a etiquetas multi-label."""
+"""UCF-Crime dataset management and category-to-multi-label mapping."""
 
 import os
 from pathlib import Path
 
 DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "ucf-crime"
 
-# Las 13 categorías de anomalía + Normal
+# The 13 anomaly categories + Normal
 CATEGORIES = [
     "Normal",
     "Abuse",
@@ -23,8 +23,8 @@ CATEGORIES = [
     "Vandalism",
 ]
 
-# Mapeo: categoría → [intrusion_probable, requiere_verificacion_visual,
-#                       notificar_propietario, despachar_movil]
+# Mapping: category → [intrusion_probable, requiere_verificacion_visual,
+#                        notificar_propietario, despachar_movil]
 CATEGORY_TO_LABELS = {
     "Normal":        [0, 0, 0, 0],
     "Abuse":         [1, 1, 1, 1],
@@ -44,7 +44,7 @@ CATEGORY_TO_LABELS = {
 
 
 def get_video_paths() -> list[tuple[str, str]]:
-    """Retorna lista de (ruta_video, categoría) para todos los videos encontrados."""
+    """Returns a list of (video_path, category) for all videos found."""
     videos = []
     for category in CATEGORIES:
         cat_dir = DATA_DIR / category
@@ -57,7 +57,7 @@ def get_video_paths() -> list[tuple[str, str]]:
 
 
 def get_dataset_status() -> dict:
-    """Retorna estado actual del dataset: qué categorías tienen videos."""
+    """Returns the current dataset status: which categories have videos."""
     status = {}
     total = 0
     for category in CATEGORIES:
@@ -72,7 +72,7 @@ def get_dataset_status() -> dict:
 
 
 def setup_directories():
-    """Crea la estructura de directorios para el dataset."""
+    """Creates the directory structure for the dataset."""
     for category in CATEGORIES:
         (DATA_DIR / category).mkdir(parents=True, exist_ok=True)
     return str(DATA_DIR)

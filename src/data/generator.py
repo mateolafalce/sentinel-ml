@@ -1,4 +1,4 @@
-"""Generador de datos sintéticos para eventos de seguridad."""
+"""Synthetic data generator for security events."""
 
 import numpy as np
 
@@ -23,7 +23,7 @@ LABEL_NAMES = [
 
 
 def generate_dataset(n_samples: int = 2000, seed: int = 42) -> tuple[np.ndarray, np.ndarray]:
-    """Genera datos sintéticos con reglas lógicas realistas.
+    """Generates synthetic data using realistic logical rules.
 
     Features (8):
         0: sensor_movimiento      [0, 1]
@@ -43,7 +43,7 @@ def generate_dataset(n_samples: int = 2000, seed: int = 42) -> tuple[np.ndarray,
     """
     rng = np.random.RandomState(seed)
 
-    # Features binarias
+    # Binary features
     mov = rng.randint(0, 2, n_samples)
     cam = rng.randint(0, 2, n_samples)
     noche = rng.randint(0, 2, n_samples)
@@ -55,10 +55,10 @@ def generate_dataset(n_samples: int = 2000, seed: int = 42) -> tuple[np.ndarray,
 
     X = np.column_stack([mov, cam, noche, zona, puerta, ventana, ruido, historico])
 
-    # Reglas para generar etiquetas con ruido
+    # Rules for generating labels with noise
     noise = lambda: rng.random(n_samples) < 0.05
 
-    # Intrusión probable: movimiento + (noche o zona_riesgo) + (puerta o ventana o ruido alto)
+    # Probable intrusion: motion + (night or risk zone) + (door or window or loud noise)
     intrusion = (
         (mov == 1)
         & ((noche == 1) | (zona == 1))
@@ -66,17 +66,17 @@ def generate_dataset(n_samples: int = 2000, seed: int = 42) -> tuple[np.ndarray,
     ).astype(int)
     intrusion = np.abs(intrusion - noise().astype(int))
 
-    # Requiere verificación visual: cámara activa + (movimiento o ruido alto)
+    # Requires visual verification: active camera + (motion or loud noise)
     verificacion = ((cam == 1) & ((mov == 1) | (ruido > 0.5))).astype(int)
     verificacion = np.abs(verificacion - noise().astype(int))
 
-    # Notificar propietario: cualquier señal significativa
+    # Notify owner: any significant signal
     notificar = (
         (mov == 1) | ((noche == 1) & (zona == 1)) | (historico > 0.7)
     ).astype(int)
     notificar = np.abs(notificar - noise().astype(int))
 
-    # Despachar móvil: intrusión probable + zona de riesgo + histórico alto
+    # Dispatch mobile unit: probable intrusion + risk zone + high incident history
     despachar = (
         (intrusion == 1) & (zona == 1) & (historico > 0.4)
     ).astype(int)

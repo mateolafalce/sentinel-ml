@@ -1,4 +1,4 @@
-"""Modelo MultiOutputClassifier con scikit-learn."""
+"""MultiOutputClassifier model with scikit-learn."""
 
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
