@@ -38,16 +38,6 @@ Signals (8) → ML Classifier → Prediction (4 labels)
                          severity / analysis / actions
 ```
 
-### Inputs (8 features)
-
-**Synthetic data:** `sensor_movimiento`, `camara_activa`, `hora_nocturna`, `zona_riesgo`, `sensor_puerta`, `sensor_ventana`, `nivel_ruido`, `historico_incidentes`
-
-**UCF-Crime (YOLO):** `avg_personas`, `max_personas`, `avg_confianza_persona`, `area_persona_max`, `intensidad_movimiento`, `clases_unicas`, `detecciones_promedio`, `velocidad_persona`
-
-### Outputs (4 labels)
-
-`intrusion_probable`, `requiere_verificacion_visual`, `notificar_propietario`, `despachar_movil`
-
 ### Computed severity
 
 | Severity | Condition |
