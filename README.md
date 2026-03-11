@@ -1,12 +1,6 @@
 # Sentinel ML — Security Operations Center
 
-Multi-label security anomaly detection system with AI-powered incident report generation (OpenAI GPT-4o). Web dashboard for security operators.
-
-## Requirements
-
-- Python 3.11+
-- [uv](https://docs.astral.sh/uv/)
-- OpenAI API key
+Multi-label security anomaly detection system with AI-powered incident report generation (OpenAI GPT-4o). Web dashboard for security operators. Runs at http://localhost:5000
 
 ## Setup
 
@@ -14,7 +8,6 @@ Multi-label security anomaly detection system with AI-powered incident report ge
 uv sync
 export OPENAI_API_KEY="sk-..."
 uv run python -m src.server
-# → http://localhost:5000
 ```
 
 ## Usage flow
@@ -56,39 +49,3 @@ Signals (8) → ML Classifier → Prediction (4 labels)
 | HIGH     | intrusion_probable + another label |
 | CRITICAL | despachar_movil active |
 
-## Structure
-
-```
-src/
-├── server.py              # Flask REST API
-├── llm/
-│   └── reporter.py        # OpenAI GPT-4o integration
-├── data/
-│   ├── generator.py       # Synthetic dataset
-│   ├── feature_extractor.py  # YOLO feature extraction from video
-│   └── ucf_crime.py       # UCF-Crime dataset management
-├── models/
-│   ├── sklearn_model.py   # RandomForest MultiOutputClassifier
-│   └── pytorch_model.py   # 3-layer MLP, BCEWithLogitsLoss
-└── metrics.py             # hamming_loss, f1, exact_match
-
-static/
-├── index.html             # SOC Dashboard (SPA)
-├── app.js                 # Client logic
-└── style.css              # Dark SOC-style theme
-```
-
-## API
-
-| Method | Path | Description |
-|--------|------|-------------|
-| GET  | `/api/info`               | System status, features, labels |
-| POST | `/api/generate`           | Generate synthetic dataset `{ n_samples }` |
-| POST | `/api/train`              | Train model `{ model, epochs? }` |
-| POST | `/api/predict`            | Raw prediction `{ model, signals }` |
-| POST | `/api/report`             | Prediction + LLM report `{ model, signals }` |
-| GET  | `/api/incidents`          | Incident history (max 50) |
-| GET  | `/api/ucf/status`         | UCF-Crime dataset status |
-| POST | `/api/ucf/setup`          | Create folder structure |
-| POST | `/api/ucf/extract`        | Extract features with YOLO (async) |
-| GET  | `/api/ucf/extract/status` | Extraction progress |
