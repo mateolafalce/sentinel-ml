@@ -1,0 +1,18 @@
+[project]
+name = "sentinel-ml"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "flask>=3.1.3",
+    "numpy>=2.4.3",
+    "openai>=1.0.0",
+    "opencv-python-headless>=4.13.0.92",
+    "scikit-learn>=1.8.0",
+    "torch>=2.10.0",
+    "ultralytics>=8.4.21",
+]
+
+[project.scripts]
+sentinel-ml = "src.server:main"
