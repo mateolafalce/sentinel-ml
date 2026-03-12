@@ -13,6 +13,15 @@ Multi-label security anomaly detection system with AI-powered incident report ge
 
 ## Setup
 
+**With Docker (recommended):**
+
+```bash
+export OPENAI_API_KEY="sk-..."
+docker compose up --build
+```
+
+**Local:**
+
 ```bash
 uv sync
 export OPENAI_API_KEY="sk-..."
